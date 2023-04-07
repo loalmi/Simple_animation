@@ -1,0 +1,96 @@
+from tkinter import *
+import random
+
+def close():
+    global running
+    running = False
+    
+# Размер окна
+h = 512
+w = 512
+    
+#Создание окна
+root = Tk()
+root.title("Анимация")
+root.config(width = w, height = h)
+root.resizable(False, False)
+root.protocol('WM_DELETE_WINDOW', close)
+
+canvas = Canvas(root, bg = 'black', height = h, width = w) # Холст
+canvas.pack()
+
+# Параметры объекта
+x = w/2
+y = h/2
+r = 20
+speed_x = 1 # горизонтальная скорость
+
+# Создание объекта
+colors = ['red','blue', 'black', 'yellow','green','orange','purple','pink']
+def create_objects(N):
+    obj_list = []
+    for i in range(N):
+        x = random.uniform(0, w)
+        y = random.uniform(0, h)
+        r = 20
+        if x <= w/2:
+            speed_x = random.uniform(-4, -0.1)
+        else:
+            speed_x = random.uniform(0.1, 4)
+        if y <= h/2:
+            speed_y = random.uniform(-4, -0.1)
+        else:
+            speed_y = random.uniform(-0.1, 4)            
+        
+        obj = canvas.create_oval(x-r/4, y-r/4, x+r/4, y+r/4, 
+                         fill = colors[random.randint(0,len(colors)-1)], outline = 'white', width = 1)
+        config = {'obj' : obj,
+                 'speed_x' : speed_x,
+                 'speed_y' : speed_y}
+        obj_list.append(config)
+    return obj_list
+
+objects = create_objects(100)
+objects1 = create_objects(100)
+
+
+import time
+# Игровой цикл
+running = True
+
+while running:
+    # Управление объектами окна
+
+    for config in range(len(objects)):
+        #canvas.move(config['obj'], config['speed_x'], config['speed_y'])
+        coords = canvas.coords(objects[config]['obj'])
+        if coords[0] > h or coords[1] > w:
+            
+            print(coords[0], coords[1])
+
+            x = random.uniform(0, w)
+            y = random.uniform(0, h)
+            
+            if x <= w/2:
+                speed_x = random.uniform(-4, -0.1)
+            else:
+                speed_x = random.uniform(0.1, 4)
+            if y <= h/2:
+                speed_y = random.uniform(-4, -0.1)
+            else:
+                speed_y = random.uniform(0.1, 4)
+            obj = canvas.create_oval(x-r/4, y-r/4, x+r/4, y+r/4, 
+                         fill = colors[random.randint(0,len(colors)-1)], outline = 'white', width = 1)
+            canvas.delete(objects[config]['obj'])
+            objects[config] = {'obj' : obj,'speed_x' : speed_x, 'speed_y' : speed_y}
+            #canvas.delete(objects[config])
+        canvas.move(objects[config]['obj'], objects[config]['speed_x'], objects[config]['speed_y'])
+
+
+
+    
+    # Обновление окна
+    root.update()
+    time.sleep(0.01)
+
+root.destroy()
